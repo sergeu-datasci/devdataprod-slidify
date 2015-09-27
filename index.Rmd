@@ -84,10 +84,11 @@ z <- sin(sqrt(x^2+y^2))/sqrt(x^2+y^2)
 # Plot
 surf3D(x, y, z, border = "black")
 ```
+
 *** {name: right}
 __Plot__
 
-(Hide the code, but evaluate it here ;)
+(Hide the code, but evaluate it here)
 ```{r echo=FALSE, fig.height=6}
 library(plot3D)
 # Create X*Y grid
