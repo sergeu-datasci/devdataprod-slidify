@@ -63,10 +63,11 @@ sidebarPanel(
 
 ## Just for fun - plot Sombrero function
 
-$f(x,y)=\frac{sin(\sqrt{x^2+y^2})}{\sqrt{x^2+y^2}}$
+$$f(x,y)=\frac{sin(\sqrt{x^2+y^2})}{\sqrt{x^2+y^2}}$$
 
 *** {name: left}
 __R code__
+
 (Show the code, but do not evaluate)
 ```{r eval=FALSE}
 library(plot3D)
@@ -85,6 +86,7 @@ surf3D(x, y, z, border = "black")
 ```
 *** {name: right}
 __Plot__
+
 (Hide the code, but evaluate it here ;)
 ```{r echo=FALSE, fig.height=6}
 library(plot3D)
