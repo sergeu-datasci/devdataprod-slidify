@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Presentation of Shiny apps</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Presentation of Shiny apps">
+  <meta name="author" content="Sergei Uglitskikh">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="libraries/widgets/quiz/css/demo.css"></link>
+<link rel=stylesheet href="libraries/widgets/bootstrap/css/bootstrap.css"></link>
+<link rel=stylesheet href="libraries/widgets/nvd3/css/nv.d3.css"></link>
+<link rel=stylesheet href="libraries/widgets/nvd3/css/rNVD3.css"></link>
+<link rel=stylesheet href="./assets/css/slidify.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  <script src="libraries/widgets/nvd3/js/jquery-1.8.2.min.js"></script>
+<script src="libraries/widgets/nvd3/js/d3.v3.min.js"></script>
+<script src="libraries/widgets/nvd3/js/nv.d3.min-new.js"></script>
+<script src="libraries/widgets/nvd3/js/fisheye.js"></script>
+
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Presentation of Shiny apps</h1>
+    <h2>Developing Data Products course, Course project, Slidify assignment</h2>
+    <p>Sergei Uglitskikh<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1">
+  <hgroup>
+    <h2>My first Shiny idea - 3D Scatter Plot</h2>
+  </hgroup>
+  <article>
+    <p>Initially I tried to implement an interactive Shiny application which may help to explore a dataset on 3D scatter plot.</p>
+  
+    <div class='left' style='float:left;width:38%'>
+     <ul>
+<li>3D plot is very intuitive</li>
+<li>You can rotate and zoom the plot with the mouse</li>
+<li>But there is one problem... It requires two packages, <a href="https://github.com/trestletech/shinyRGL">ShinyRGL</a> and <a href="https://r-forge.r-project.org/projects/rgl/">RGL</a>, which latest versions are currently INCOMPATIBLE.</li>
+<li>I managed to find a combination of compatible versions working on my local machine, but it does not work on the Shinyapps.io server.</li>
+<li>Under Mac OS 10.10.5, you can use:
+
+<ul>
+<li><code>shinyRGL</code> - the latest available version</li>
+<li><code>rgl</code> - version 0.93.1098</li>
+</ul></li>
+</ul>
+
+    </div>    
+    <div class='right' style='float:right;width:58%'>
+     <p><img src="assets/img/Shinyapps.png" alt="Screenshot form the local machine"></p>
+
+    </div>
+  </article>
+</slide>
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Other interesting aspects of the first Shiny idea</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>On the <em>sidebar</em>, there are three <code>selectInput</code> widgets. Two of them are <strong>context dependent</strong>: selection lookups should  include all the dataset variables except of the alredy selected variables (indeed, you cannot build a formula <code>z ~ x + y</code> where one variable is used more than once).</li>
+<li>In that case, in server.R you should make a list of valid variables and render <code>selectInput</code> element.</li>
+</ul>
+
+<pre><code class="r"># server.R (extract from the code)
+varNames &lt;- names(mtcars)
+
+# Reactive code to update lookups for X and Y variables which must be different from Z and each other.
+xList &lt;- reactive({ varNames[!varNames==input$z] })
+yList &lt;- reactive({ varNames[!varNames==input$z &amp; !varNames==input$x] })
+
+# Create dynamic input elements with updated lookups. Also define the lookup default values.
+output$selectZ &lt;- renderUI({selectInput(&quot;z&quot;, label = &quot;Select Z&quot;, choices = varNames, selected = &quot;mpg&quot;)})
+output$selectX &lt;- renderUI({selectInput(&quot;x&quot;, label = &quot;Select X&quot;, choices = xList(), selected = &quot;cyl&quot;)})
+output$selectY &lt;- renderUI({selectInput(&quot;y&quot;, label = &quot;Select Y&quot;, choices = yList(), selected = &quot;disp&quot;)})
+</code></pre>
+
+<ul>
+<li>In ui.R, you should include the rendered html code.</li>
+</ul>
+
+<pre><code class="r"># ui.R (extract from the code)
+sidebarPanel(
+    htmlOutput(&quot;selectZ&quot;),
+    htmlOutput(&quot;selectX&quot;),
+    htmlOutput(&quot;selectY&quot;),
+    &lt;...&gt;
+)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3">
+  <hgroup>
+    <h2>Just for fun - plot Sombrero function</h2>
+  </hgroup>
+  <article>
+    <p>\(f(x,y)=\frac{sin(\sqrt{x^2+y^2})}{\sqrt{x^2+y^2}}\)</p>
+  
+    <div class='left' style='float:left;width:38%'>
+     <p><strong>R code</strong>
+(Show the code, but do not evaluate)</p>
+
+<pre><code class="r">library(plot3D)
+# Create X*Y grid
+X &lt;- seq(-10, 10, length.out = 50)
+Y &lt;- seq(-10, 10, length.out = 50)
+M &lt;- mesh(X, Y)
+
+# Create variables and function as matrcies
+x &lt;- M$x
+y &lt;- M$y
+z &lt;- sin(sqrt(x^2+y^2))/sqrt(x^2+y^2)
+
+# Plot
+surf3D(x, y, z, border = &quot;black&quot;)
+</code></pre>
+
+    </div>    
+    <div class='right' style='float:right;width:58%'>
+     <p><strong>Plot</strong>
+(Hide the code, but evaluate it here ;)
+<img src="assets/fig/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4"> </p>
+
+    </div>
+  </article>
+</slide>
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Just for fun - quiz</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div class="quiz quiz-single well ">
+  <p>How do the slide 2 and 4 show text and image/plot side by side (text on the left side, and image on the right)?</p>
+
+<ol>
+<li>By magic</li>
+<li><em>This slide has a two column layout</em></li>
+<li>This slide has a table layout</li>
+<li>I do not know</li>
+</ol>
+
+  <button class="quiz-submit btn btn-primary">Submit</button>
+  <button class="quiz-toggle-hint btn btn-info">Show Hint</button>
+  <button class="quiz-show-answer btn btn-success">Show Answer</button>
+  <button class="quiz-clear btn btn-danger">Clear</button>
+  
+  <div class="quiz-hint">
+  <p>This is definitely not a table.</p>
+
+</div>
+<div class="quiz-explanation">
+  <p>Read <em>Customizing Layouts</em> in the <a href="http://slidify.org/customize.html">Slidify Customization Tutorial</a>.</p>
+
+</div>
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='My first Shiny idea - 3D Scatter Plot'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Other interesting aspects of the first Shiny idea'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Just for fun - plot Sombrero function'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Just for fun - quiz'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  <script src="libraries/widgets/quiz/js/jquery.quiz.js"></script>
+<script src="libraries/widgets/quiz/js/mustache.min.js"></script>
+<script src="libraries/widgets/quiz/js/quiz-app.js"></script>
+<script src="libraries/widgets/bootstrap/js/bootstrap.min.js"></script>
+<script src="libraries/widgets/bootstrap/js/bootbox.min.js"></script>
+
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<script>  
+  $(function (){ 
+    $("#example").popover(); 
+    $("[rel='tooltip']").tooltip(); 
+  });  
+  </script>  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
