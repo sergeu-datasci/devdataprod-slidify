@@ -87,10 +87,11 @@ z <- sin(sqrt(x^2+y^2))/sqrt(x^2+y^2)
 # Plot
 surf3D(x, y, z, border = "black")
 ```
+
 *** {name: right}
 __Plot__
 
-(Hide the code, but evaluate it here ;)
+(Hide the code, but evaluate it here)
 ![plot of chunk unnamed-chunk-4](assets/fig/unnamed-chunk-4-1.png) 
 
 --- &radio
