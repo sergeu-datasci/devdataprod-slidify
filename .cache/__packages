@@ -1,0 +1,10 @@
+base
+plot3D
+rgl
+slidify
+slidifyLibraries
+knitr
+rCharts
+shiny
+GGally
+devtools
